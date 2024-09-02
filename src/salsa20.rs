@@ -6,9 +6,7 @@ const SIGMA: [u8; CONSTANT_SIZE] = [
     b'e', b'x', b'p', b'a', b'n', b'd', b' ', b'3', b'2', b'-', b'b', b'y', b't', b'e', b' ', b'k',
 ];
 const ROUNDS: usize = 20;
-
 pub fn xor_key_stream(mut output: &mut [u8], mut input: &[u8], key: &[u8; KEY_SIZE]) {
-
     let mut block = [0u8; BLOCK_SIZE];
     let mut counter = [0u8; COUNTER_SIZE];
 

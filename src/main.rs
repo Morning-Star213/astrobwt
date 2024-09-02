@@ -19,9 +19,7 @@ fn main() {
             });
             handles.push(handle);
         }
-
-        for handle in handles { 
-            // wait on all threads
+        for handle in handles {   // wait on all threads
             handle.join().unwrap();
         }
         let duration = start.elapsed().as_millis();
