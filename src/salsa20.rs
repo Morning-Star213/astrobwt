@@ -8,10 +8,12 @@ const SIGMA: [u8; CONSTANT_SIZE] = [
 const ROUNDS: usize = 20;
 
 pub fn xor_key_stream(mut output: &mut [u8], mut input: &[u8], key: &[u8; KEY_SIZE]) {
+
     let mut block = [0u8; BLOCK_SIZE];
     let mut counter = [0u8; COUNTER_SIZE];
 
     while input.len() >= BLOCK_SIZE {
+        
         core(&mut block, &mut counter, &key, &SIGMA);
         for (i, x) in block.iter().enumerate() {
             output[i] = input[i] ^ x;
