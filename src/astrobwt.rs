@@ -1,11 +1,9 @@
 use sha3::{Digest, Sha3_256};
 use std::convert::TryInto;
-
 const STAGE1_LENGTH: usize = 147253;
 const COUNTING_SORT_BITS: u64 = 10;
 const COUNTING_SORT_SIZE: u64 = 1 << COUNTING_SORT_BITS;
 pub const MAX_LENGTH: usize = 1024 * 1024 + STAGE1_LENGTH + 1024;
-
 pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     let mut key = sha3(&input); // Step 1: calculate SHA3 of input data
     let mut stage1 = [0u8; STAGE1_LENGTH + 64];
@@ -22,7 +20,6 @@ pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     if stage2_length > max_limit {
         panic!("Max limit reached");
     }
-
     let mut stage2 = vec![0u8; stage2_length + 1 + 64];
     crate::salsa20::xor_key_stream(
         &mut stage2[1..stage2_length + 1],
@@ -34,7 +31,6 @@ pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     let key = sha3(&stage2_result[..stage2_length + 1]); // Step 8: calculate SHA3 of BWT data from step 7
     key.into()
 }
-
 fn sha3(input: &[u8]) -> [u8; 32] {
     let mut output: [u8; 32] = [0; 32];
     let mut hasher = Sha3_256::new();
@@ -43,7 +39,6 @@ fn sha3(input: &[u8]) -> [u8; 32] {
     output.copy_from_slice(hasher.finalize().as_slice());
     output
 }
-
 fn smaller(input: &[u8], a: &u64, b: &u64) -> bool {
     let value_a = a >> 21;
     let value_b = b >> 21;
@@ -87,7 +82,6 @@ fn sort_indices(n: usize, input_extra: &[u8], output: &mut [u8]) {
             counters[1][(k >> A) as usize] += 1;
         }
     }
-
     let mut prev: [u32; 2] = [counters[0][0], counters[1][0]];
     counters[0][0] = prev[0] - 1;
     counters[1][0] = prev[1] - 1;
@@ -100,7 +94,6 @@ fn sort_indices(n: usize, input_extra: &[u8], output: &mut [u8]) {
         prev[0] = cur[0];
         prev[1] = cur[1];
     }
-
     for i in (0..n).rev() {
         let k = u64::from_be_bytes(input_extra[1+i..1+i+8].try_into().unwrap());
         let idx = ((k >> B) & (COUNTING_SORT_SIZE - 1)) as usize;

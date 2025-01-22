@@ -1,9 +1,7 @@
 mod astrobwt;
 mod salsa20;
-
 use std::time::Instant;
 use std::thread;
-
 fn main() {
     let iterations = 1000;
     println!("{:20} {:20} {:20} {:20} {:20}", "Threads", "Total Time", "Total Iterations", "Time/PoW (ms)", "Hash Rate/Sec");
