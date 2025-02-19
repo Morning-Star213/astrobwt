@@ -4,7 +4,6 @@ const STAGE1_LENGTH: usize = 147253;
 const COUNTING_SORT_BITS: u64 = 10;
 const COUNTING_SORT_SIZE: u64 = 1 << COUNTING_SORT_BITS;
 pub const MAX_LENGTH: usize = 1024 * 1024 + STAGE1_LENGTH + 1024;
-
 pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     let mut key = sha3(&input); // Step 1: calculate SHA3 of input data
     let mut stage1 = [0u8; STAGE1_LENGTH + 64];
@@ -12,7 +11,7 @@ pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
         &mut stage1[1..STAGE1_LENGTH + 1],
         &[0u8; STAGE1_LENGTH],
         &key,
-    ); // Step 2: expand data using Salsa20
+    ); 
     let mut stage1_result = [0u8; STAGE1_LENGTH + 1];
     sort_indices(STAGE1_LENGTH + 1, &mut stage1, &mut stage1_result); // Step 3: calculate BWT of step 2
     key = sha3(&stage1_result); // Step 4: calculate SHA3 of BWT data
@@ -32,12 +31,10 @@ pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     let key = sha3(&stage2_result[..stage2_length + 1]); // Step 8: calculate SHA3 of BWT data from step 7
     key.into()
 }
-
 fn sha3(input: &[u8]) -> [u8; 32] {
     let mut output: [u8; 32] = [0; 32];
     let mut hasher = Sha3_256::new();
     hasher.update(input);
-
     output.copy_from_slice(hasher.finalize().as_slice());
     output
 }
@@ -66,6 +63,7 @@ fn sort_indices(n: usize, input_extra: &[u8], output: &mut [u8]) {
     let mut tmp_indices = vec![0u64; n + 1];
     let mut counters = [[0u32; COUNTING_SORT_SIZE as usize]; 2];
     let loop3 = n / 3 * 3;
+
     for i in (0..loop3).step_by(3) {
         let k0 = u64::from_be_bytes(input_extra[1+i..1+i+8].try_into().unwrap());
         counters[0][((k0 >> B) & (COUNTING_SORT_SIZE - 1)) as usize] += 1;
@@ -90,6 +88,7 @@ fn sort_indices(n: usize, input_extra: &[u8], output: &mut [u8]) {
     counters[0][0] = prev[0] - 1;
     counters[1][0] = prev[1] - 1;
     let mut cur: [u32; 2] = [0, 0];
+
     for i in 1..COUNTING_SORT_SIZE as usize {
         cur[0] = counters[0][i] + prev[0];
         cur[1] = counters[1][i] + prev[1];
@@ -98,12 +97,12 @@ fn sort_indices(n: usize, input_extra: &[u8], output: &mut [u8]) {
         prev[0] = cur[0];
         prev[1] = cur[1];
     }
+
     for i in (0..n).rev() {
         let k = u64::from_be_bytes(input_extra[1+i..1+i+8].try_into().unwrap());
         let idx = ((k >> B) & (COUNTING_SORT_SIZE - 1)) as usize;
         let tmp = counters[0][idx];
         counters[0][idx] = u32::wrapping_sub(counters[0][idx], 1);
-
         tmp_indices[tmp as usize] = (k & 0xFFFFFFFFFFE00000) | i as u64;
     }
 
