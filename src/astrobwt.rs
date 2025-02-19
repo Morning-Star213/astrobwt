@@ -4,7 +4,6 @@ const STAGE1_LENGTH: usize = 147253;
 const COUNTING_SORT_BITS: u64 = 10;
 const COUNTING_SORT_SIZE: u64 = 1 << COUNTING_SORT_BITS;
 pub const MAX_LENGTH: usize = 1024 * 1024 + STAGE1_LENGTH + 1024;
-
 pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     let mut key = sha3(&input); // Step 1: calculate SHA3 of input data
     let mut stage1 = [0u8; STAGE1_LENGTH + 64];
@@ -13,7 +12,6 @@ pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
         &[0u8; STAGE1_LENGTH],
         &key,
     ); 
-    
     let mut stage1_result = [0u8; STAGE1_LENGTH + 1];
     sort_indices(STAGE1_LENGTH + 1, &mut stage1, &mut stage1_result); // Step 3: calculate BWT of step 2
     key = sha3(&stage1_result); // Step 4: calculate SHA3 of BWT data
@@ -33,12 +31,10 @@ pub fn compute(input: &[u8], max_limit: usize) -> Vec<u8> {
     let key = sha3(&stage2_result[..stage2_length + 1]); // Step 8: calculate SHA3 of BWT data from step 7
     key.into()
 }
-
 fn sha3(input: &[u8]) -> [u8; 32] {
     let mut output: [u8; 32] = [0; 32];
     let mut hasher = Sha3_256::new();
     hasher.update(input);
-
     output.copy_from_slice(hasher.finalize().as_slice());
     output
 }

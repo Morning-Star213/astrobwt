@@ -6,7 +6,6 @@ use std::thread;
 fn main() {
     let iterations = 1000;
     println!("{:20} {:20} {:20} {:20} {:20}", "Threads", "Total Time", "Total Iterations", "Time/PoW (ms)", "Hash Rate/Sec");
-    
     for bench in 1..=8 {
         let start = Instant::now();
         let mut handles = vec![];
@@ -19,7 +18,6 @@ fn main() {
             });
             handles.push(handle);
         }
-
         for handle in handles {
             handle.join().unwrap();
         }
